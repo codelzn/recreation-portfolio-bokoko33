@@ -8,8 +8,7 @@ export default class Renderer {
 	private scene: THREE.Scene
 	private camera: Camera
 	private renderer?: THREE.WebGLRenderer
-	constructor(private experience: Experience) {
-		this.experience = experience
+	constructor(private readonly experience: Experience) {
 		this.sizes = this.experience.sizes
 		this.canvas = this.experience.canvas
 		this.scene = this.experience.scene

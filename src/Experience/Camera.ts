@@ -1,21 +1,24 @@
 import * as THREE from "three"
 import type Sizes from "./utils/Sizes"
 import Experience from "."
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 export default class Camera {
 	private sizes: Sizes
-	private scene: THREE.Scene
-	private canvas: HTMLCanvasElement
+  private scene: THREE.Scene
+  private canvas: HTMLCanvasElement
 	public perspectiveCamera?: THREE.PerspectiveCamera
 	public orthographicCamera?: THREE.OrthographicCamera
 	private frustum: number = 5
+	private controls?: OrbitControls
 	public constructor(private readonly experience: Experience) {
 		this.sizes = this.experience.sizes
-		this.scene = this.experience.scene
-		this.canvas = this.experience.canvas
+    this.scene = this.experience.scene
+    this.canvas = this.experience.canvas
 
 		this.createPerspectiveCamera()
 		this.createOrthographicCamera()
+		this.setOrbitControls()
 	}
 	private createPerspectiveCamera() {
 		this.perspectiveCamera = new THREE.PerspectiveCamera(
@@ -25,6 +28,7 @@ export default class Camera {
 			100
 		)
 		this.scene.add(this.perspectiveCamera)
+		this.perspectiveCamera.position.set(0, 0, 5)
 	}
 
 	private createOrthographicCamera() {
@@ -38,6 +42,14 @@ export default class Camera {
 		)
 		this.scene.add(this.orthographicCamera)
 	}
+
+	private setOrbitControls() {
+		this.controls = new OrbitControls(
+			this.perspectiveCamera!,
+			this.canvas
+    )
+    this.controls.enableDamping = true
+	}
 	public resize() {
 		this.perspectiveCamera!.aspect = this.sizes.aspect
 		this.perspectiveCamera!.updateProjectionMatrix()
@@ -48,5 +60,7 @@ export default class Camera {
 		this.orthographicCamera!.bottom = -this.frustum / 2
 		this.orthographicCamera!.updateProjectionMatrix()
 	}
-	public update() {}
+  public update() {
+    this.controls?.update()
+  }
 }
