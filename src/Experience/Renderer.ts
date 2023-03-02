@@ -35,6 +35,6 @@ export default class Renderer {
 		this.renderer!.setPixelRatio(this.sizes.pixelRatio)
 	}
 	update() {
-		this.renderer!.render(this.scene, this.camera.perspectiveCamera!)
+		this.renderer!.render(this.scene, this.camera.orthographicCamera!)
 	}
 }

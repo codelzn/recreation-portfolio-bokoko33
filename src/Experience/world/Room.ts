@@ -3,14 +3,21 @@ import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader"
 import Experience from ".."
 import Time from "../utils/Time"
 import Resources from "../utils/Resources"
+import gsap from "gsap"
 export default class Room {
 	private scene: THREE.Scene
 	private time: Time
 	private resources: Resources
 	private room: GLTF
-	private actualRoom: THREE.Object3D
+	public actualRoom: THREE.Object3D
 	private mixer?: THREE.AnimationMixer
 	private swim?: THREE.AnimationAction
+	private lerp: { current: number; target: number; ease: number } = {
+		current: 0,
+		target: 0,
+		ease: 0.1,
+  }
+  private rotation: number = 0
 	constructor(private readonly experience: Experience) {
 		this.scene = this.experience.scene
 		this.time = this.experience.time
@@ -19,9 +26,10 @@ export default class Room {
 		this.actualRoom = this.room.scene
 		this.setModel()
 		this.setAnimation()
+		this.onMouseMove()
 	}
 	private setModel() {
-    this.actualRoom.children.forEach(child => {
+		this.actualRoom.children.forEach(child => {
 			child.castShadow = true
 			child.receiveShadow = true
 			if (child instanceof THREE.Group) {
@@ -66,8 +74,20 @@ export default class Room {
 		this.swim.play()
 	}
 
+	private onMouseMove() {
+    window.addEventListener("mousemove", e => {
+      this.rotation = ((e.clientX - window.innerWidth / 2) * 2) / window.innerWidth
+      this.lerp.target = this.rotation * 0.01
+    })
+	}
 	public resize() {}
 	public update() {
+		this.lerp.current = gsap.utils.interpolate(
+			this.lerp.current,
+			this.lerp.target,
+			this.lerp.ease
+    )
+    this.actualRoom.rotation.y = this.lerp.current
 		if (this.mixer) {
 			this.mixer.update(this.time.delta * 0.0009)
 		}

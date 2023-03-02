@@ -1,52 +1,25 @@
 import * as THREE from "three"
+import gsap from "gsap"
 import Experience from ".."
-import Time from "../utils/Time"
-import Resources from "../utils/Resources"
+import Room from "./Room"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 export default class Controls {
 	private scene: THREE.Scene
-	private time: Time
-	private resources: Resources
-	private curve?: THREE.CatmullRomCurve3
-	private dummyVector: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
-	private orthographicCamera?: THREE.OrthographicCamera
-	public process: number = 0
+  private orthographicCamera?: THREE.OrthographicCamera
+  private timeline?: gsap.core.Timeline
+  private room: THREE.Object3D
 	constructor(private readonly experience: Experience) {
-		this.scene = this.experience.scene
-		this.time = this.experience.time
-		this.resources = this.experience.resources
-		this.orthographicCamera = this.experience.camera.orthographicCamera
+    this.scene = this.experience.scene
+    this.room = this.experience.world.room!.actualRoom
+    this.orthographicCamera = this.experience.camera.orthographicCamera
+    gsap.registerPlugin(ScrollTrigger)
+    document.querySelector<HTMLDivElement>(".page")!.style.overflow = "visible";
     this.setPath()
-    this.onWheel()
 	}
-	private setPath() {
-		this.curve = new THREE.CatmullRomCurve3(
-			[
-				new THREE.Vector3(-10, 0, 10),
-				new THREE.Vector3(-5, 5, 5),
-				new THREE.Vector3(0, 0, 0),
-				new THREE.Vector3(5, -5, 5),
-				new THREE.Vector3(10, 0, 10),
-			],
-			true
-		)
-
-		const points = this.curve.getPoints(50)
-		const geometry = new THREE.BufferGeometry().setFromPoints(points)
-
-		const material = new THREE.LineBasicMaterial({ color: 0xff0000 })
-
-		const curveObject = new THREE.Line(geometry, material)
-		this.scene.add(curveObject)
+  private setPath() {
+    this.timeline = gsap.timeline()
   }
-  private onWheel() {}
-
 	public resize() {}
 	public update() {
-    this.curve?.getPointAt(this.process % 1, this.dummyVector)
-    this.process -= 0.01
-    if (this.process < 0) {
-      this.process = 1
-    }
-		this.orthographicCamera?.position.copy(this.dummyVector)
 	}
 }
