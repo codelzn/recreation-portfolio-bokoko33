@@ -10,14 +10,15 @@ export default class Room {
 	private resources: Resources
 	private room: GLTF
 	public actualRoom: THREE.Object3D
+	private roomChildren: { [key: string]: THREE.Object3D } = {}
 	private mixer?: THREE.AnimationMixer
 	private swim?: THREE.AnimationAction
 	private lerp: { current: number; target: number; ease: number } = {
 		current: 0,
 		target: 0,
 		ease: 0.1,
-  }
-  private rotation: number = 0
+	}
+	private rotation: number = 0
 	constructor(private readonly experience: Experience) {
 		this.scene = this.experience.scene
 		this.time = this.experience.time
@@ -64,7 +65,24 @@ export default class Room {
 				child.position.set(0, -1, 0)
 				child.rotation.y = Math.PI / 4
 			}
+			this.roomChildren[child.name.toLowerCase()] = child
 		})
+
+		const width = 0.5
+		const height = 0.7
+		const intensity = 1
+		const rectLight = new THREE.RectAreaLight(
+			0xffffff,
+			intensity,
+			width,
+			height
+		)
+		rectLight.position.set(7.68244, 7, 0.5)
+		rectLight.rotation.x = -Math.PI / 2
+		rectLight.rotation.z = Math.PI / 4
+		this.actualRoom.add(rectLight)
+
+		this.roomChildren["rectLight"] = rectLight
 		this.scene.add(this.actualRoom)
 		this.actualRoom.scale.set(0.11, 0.11, 0.11)
 	}
@@ -75,10 +93,11 @@ export default class Room {
 	}
 
 	private onMouseMove() {
-    window.addEventListener("mousemove", e => {
-      this.rotation = ((e.clientX - window.innerWidth / 2) * 2) / window.innerWidth
-      this.lerp.target = this.rotation * 0.01
-    })
+		window.addEventListener("mousemove", e => {
+			this.rotation =
+				((e.clientX - window.innerWidth / 2) * 2) / window.innerWidth
+			this.lerp.target = this.rotation * 0.01
+		})
 	}
 	public resize() {}
 	public update() {
@@ -86,8 +105,8 @@ export default class Room {
 			this.lerp.current,
 			this.lerp.target,
 			this.lerp.ease
-    )
-    this.actualRoom.rotation.y = this.lerp.current
+		)
+		this.actualRoom.rotation.y = this.lerp.current
 		if (this.mixer) {
 			this.mixer.update(this.time.delta * 0.0009)
 		}
