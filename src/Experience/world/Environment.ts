@@ -1,15 +1,12 @@
 import * as THREE from "three"
 import Experience from ".."
-import Resources from "../utils/Resources"
 import gsap from "gsap"
 export default class Room {
 	private scene: THREE.Scene
-	private resources: Resources
 	private sunLight?: THREE.DirectionalLight
 	private ambientLight?: THREE.AmbientLight
 	constructor(private readonly experience: Experience) {
 		this.scene = this.experience.scene
-		this.resources = this.experience.resources
 		this.setSunLight()
 	}
 	private setSunLight() {

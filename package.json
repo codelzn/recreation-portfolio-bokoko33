@@ -15,6 +15,7 @@
     "vite": "^4.1.4"
   },
   "dependencies": {
+    "@ashthornton/asscroll": "^2.0.11",
     "events": "^3.3.0",
     "gsap": "^3.11.4",
     "lil-gui": "^0.18.0",

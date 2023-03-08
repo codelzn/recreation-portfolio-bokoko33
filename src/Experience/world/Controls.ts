@@ -2,10 +2,9 @@ import * as THREE from "three"
 import gsap from "gsap"
 import Experience from ".."
 import Sizes from "../utils/Sizes"
-import Room from "./Room"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import ASScroll from "@ashthornton/asscroll"
 export default class Controls {
-	private scene: THREE.Scene
 	private orthographicCamera?: THREE.OrthographicCamera
 	private sizes: Sizes
 	private firstMoveTimeline?: gsap.core.Timeline
@@ -17,7 +16,6 @@ export default class Controls {
 	private progressWrapper?: HTMLDivElement
 	private progressBar?: HTMLDivElement
 	constructor(private readonly experience: Experience) {
-		this.scene = this.experience.scene
 		this.sizes = this.experience.sizes
 		this.room = this.experience.world.room!.actualRoom
 		this.orthographicCamera = this.experience.camera.orthographicCamera
@@ -28,8 +26,12 @@ export default class Controls {
 		})
 		gsap.registerPlugin(ScrollTrigger)
 		document.querySelector<HTMLDivElement>(".page")!.style.overflow = "visible"
+		this.setSmoothScroll()
 		this.setScrollTrigger()
 	}
+
+	private setSmoothScroll() {}
+
 	private setScrollTrigger() {
 		ScrollTrigger.matchMedia({
 			"(min-width: 969px)": () => {
@@ -179,7 +181,6 @@ export default class Controls {
 								trigger: section,
 								start: "top bottom",
 								end: "top top",
-								markers: true,
 								scrub: 0.6,
 							},
 						})
@@ -189,18 +190,16 @@ export default class Controls {
 								trigger: section,
 								start: "bottom bottom",
 								end: "buttom top",
-								markers: true,
 								scrub: 0.6,
 							},
 						})
-          } else {
-            gsap.to(section, {
+					} else {
+						gsap.to(section, {
 							borderTopRightRadius: 10,
 							scrollTrigger: {
 								trigger: section,
 								start: "top bottom",
 								end: "top top",
-								markers: true,
 								scrub: 0.6,
 							},
 						})
@@ -210,22 +209,21 @@ export default class Controls {
 								trigger: section,
 								start: "bottom bottom",
 								end: "buttom top",
-								markers: true,
 								scrub: 0.6,
 							},
 						})
-          }
-          gsap.from(this.progressBar, {
-            scaleY: 0,
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: "bottom bottom",
-              scrub: 0.4,
-              pin: this.progressWrapper,
-              pinSpacing: false,
-            }
-          })
+					}
+					gsap.from(this.progressBar, {
+						scaleY: 0,
+						scrollTrigger: {
+							trigger: section,
+							start: "top top",
+							end: "bottom bottom",
+							scrub: 0.4,
+							pin: this.progressWrapper,
+							pinSpacing: false,
+						},
+					})
 				})
 				const animeObj: { [key: string]: gsap.core.Tween } = {}
 				this.secondPartTimeline = gsap.timeline({
