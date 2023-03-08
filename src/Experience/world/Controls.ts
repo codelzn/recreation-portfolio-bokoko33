@@ -14,8 +14,8 @@ export default class Controls {
 	private room: THREE.Object3D
 	private rectLight?: THREE.RectAreaLight
 	private progressWrapper?: HTMLDivElement
-  private progressBar?: HTMLDivElement
-  private asscroll?: ASScroll
+	private progressBar?: HTMLDivElement
+	// private asscroll?: ASScroll
 	constructor(private readonly experience: Experience) {
 		this.sizes = this.experience.sizes
 		this.room = this.experience.world.room!.actualRoom
@@ -75,9 +75,9 @@ export default class Controls {
 		return asscroll
 	}
 
-  private setSmoothScroll() {
-    this.asscroll = this.setupASScroll();
-  }
+	private setSmoothScroll() {
+		this.setupASScroll()
+	}
 
 	private setScrollTrigger() {
 		ScrollTrigger.matchMedia({
@@ -369,7 +369,11 @@ export default class Controls {
 				this.secondPartTimeline.add(animeObj.ninth, "-=0.1")
 			},
 		})
-	}
+  }
+  public log() {
+    console.log(this.secondMoveTimeline)
+    console.log(this.thirdMoveTimeline)
+  }
 	public resize() {}
 	public update() {}
 }
