@@ -14,7 +14,8 @@ export default class Controls {
 	private room: THREE.Object3D
 	private rectLight?: THREE.RectAreaLight
 	private progressWrapper?: HTMLDivElement
-	private progressBar?: HTMLDivElement
+  private progressBar?: HTMLDivElement
+  private asscroll?: ASScroll
 	constructor(private readonly experience: Experience) {
 		this.sizes = this.experience.sizes
 		this.room = this.experience.world.room!.actualRoom
@@ -29,8 +30,54 @@ export default class Controls {
 		this.setSmoothScroll()
 		this.setScrollTrigger()
 	}
+	setupASScroll() {
+		// https://github.com/ashthornton/asscroll
+		const asscroll = new ASScroll({
+			ease: 0.1,
+			disableRaf: true,
+		})
 
-	private setSmoothScroll() {}
+		gsap.ticker.add(asscroll.update)
+
+		ScrollTrigger.defaults({
+			scroller: asscroll.containerElement,
+		})
+
+		ScrollTrigger.scrollerProxy(asscroll.containerElement, {
+			scrollTop(value) {
+				if (arguments.length) {
+					asscroll.currentPos = value!
+					return
+				}
+				return asscroll.currentPos
+			},
+			getBoundingClientRect() {
+				return {
+					top: 0,
+					left: 0,
+					width: window.innerWidth,
+					height: window.innerHeight,
+				}
+			},
+			fixedMarkers: true,
+		})
+
+		asscroll.on("update", ScrollTrigger.update)
+		ScrollTrigger.addEventListener("refresh", asscroll.resize)
+
+		requestAnimationFrame(() => {
+			asscroll.enable({
+				newScrollElements: document.querySelectorAll(
+					".gsap-marker-start, .gsap-marker-end, [asscroll]"
+				),
+			})
+		})
+		return asscroll
+	}
+
+  private setSmoothScroll() {
+    this.asscroll = this.setupASScroll();
+  }
 
 	private setScrollTrigger() {
 		ScrollTrigger.matchMedia({
