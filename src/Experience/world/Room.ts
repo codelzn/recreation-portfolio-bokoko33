@@ -10,7 +10,7 @@ export default class Room {
 	private resources: Resources
 	private room: GLTF
 	public actualRoom: THREE.Object3D
-	private roomChildren: { [key: string]: THREE.Object3D } = {}
+	public roomChildren: { [key: string]: THREE.Object3D } = {}
 	private mixer?: THREE.AnimationMixer
 	private swim?: THREE.AnimationAction
 	private lerp: { current: number; target: number; ease: number } = {
@@ -61,20 +61,8 @@ export default class Room {
 				child.position.x = -0.289521
 				child.position.z = 8.83572
 			}
-			if (
-				child.name === "Mailbox" ||
-				child.name === "Lamp" ||
-				child.name === "FloorFirst" ||
-				child.name === "FloorSecond" ||
-				child.name === "FloorThird" ||
-				child.name === "Dirt" ||
-				child.name === "Flower1" ||
-				child.name === "Flower2"
-			) {
-				child.scale.set(0, 0, 0)
-			}
-			// child.scale.set(0, 0, 0);
-			if (child.name === "Cube") {
+			child.scale.set(0, 0, 0);
+      if (child.name === "Cube") {
 				child.position.set(0, -1, 0)
 				child.rotation.y = Math.PI / 4
 			}

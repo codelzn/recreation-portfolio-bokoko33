@@ -7,6 +7,7 @@ import Theme from "./Theme"
 import Renderer from "./Renderer"
 import Time from "./utils/Time"
 import World from "./world/World"
+import Preloader from "./Preloader"
 
 export default class Experience {
 	private static instance: Experience
@@ -18,7 +19,8 @@ export default class Experience {
 	public time: Time = new Time()
 	public resources: Resources
 	public world: World
-	public theme: Theme
+  public theme: Theme
+  public preloader: Preloader
 	private constructor() {
 		this.canvas =
 			document.querySelector<HTMLCanvasElement>(".experience-canvas")!
@@ -27,7 +29,8 @@ export default class Experience {
 		this.renderer = new Renderer(this)
 		this.resources = new Resources(Assets)
 		this.theme = new Theme()
-		this.world = new World(this)
+    this.world = new World(this)
+    this.preloader = new Preloader(this)
 		this.sizes.on("resize", () => {
 			this.resize()
 		})
