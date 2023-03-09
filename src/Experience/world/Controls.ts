@@ -16,6 +16,9 @@ export default class Controls {
 	private progressWrapper?: HTMLDivElement
 	private progressBar?: HTMLDivElement
 	// private asscroll?: ASScroll
+	public circleFirst?: THREE.Mesh
+	public circleSecond?: THREE.Mesh
+	public circleThird?: THREE.Mesh
 	constructor(private readonly experience: Experience) {
 		this.sizes = this.experience.sizes
 		this.room = this.experience.world.room!.actualRoom
@@ -25,6 +28,9 @@ export default class Controls {
 				this.rectLight = child as THREE.RectAreaLight
 			}
 		})
+		this.circleFirst = experience.world.floor?.circleFirst
+		this.circleSecond = experience.world.floor?.circleSecond
+		this.circleThird = experience.world.floor?.circleThird
 		gsap.registerPlugin(ScrollTrigger)
 		document.querySelector<HTMLDivElement>(".page")!.style.overflow = "visible"
 		this.setSmoothScroll()
@@ -272,6 +278,63 @@ export default class Controls {
 						},
 					})
 				})
+				// All animations
+				this.firstMoveTimeline = gsap
+					.timeline({
+						scrollTrigger: {
+							trigger: ".first-move",
+							start: "top top",
+							end: "bottom bottom",
+							scrub: 0.6,
+							invalidateOnRefresh: true,
+						},
+					})
+					.to(this.circleFirst!.scale, {
+						x: 3,
+						y: 3,
+						z: 3,
+					})
+				this.secondMoveTimeline = gsap
+					.timeline({
+						scrollTrigger: {
+							trigger: ".second-move",
+							start: "top top",
+							end: "bottom bottom",
+							scrub: 0.6,
+							invalidateOnRefresh: true,
+						},
+					})
+					.to(
+						this.circleSecond!.scale,
+						{
+							x: 3,
+							y: 3,
+							z: 3,
+						},
+						"same"
+					)
+					.to(
+						this.room.position,
+						{
+							y: 0.7,
+						},
+						"same"
+					)
+				this.thirdMoveTimeline = gsap
+					.timeline({
+						scrollTrigger: {
+							trigger: ".third-move",
+							start: "top top",
+							end: "bottom bottom",
+							scrub: 0.6,
+							invalidateOnRefresh: true,
+						},
+					})
+					.to(this.circleThird!.scale, {
+						x: 3,
+						y: 3,
+						z: 3,
+					})
 				const animeObj: { [key: string]: gsap.core.Tween } = {}
 				this.secondPartTimeline = gsap.timeline({
 					scrollTrigger: {
@@ -369,11 +432,9 @@ export default class Controls {
 				this.secondPartTimeline.add(animeObj.ninth, "-=0.1")
 			},
 		})
-  }
-  public log() {
-    console.log(this.secondMoveTimeline)
-    console.log(this.thirdMoveTimeline)
-  }
-	public resize() {}
-	public update() {}
+	}
+	public log() {
+		console.log(this.secondMoveTimeline)
+		console.log(this.thirdMoveTimeline)
+	}
 }

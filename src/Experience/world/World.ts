@@ -7,7 +7,7 @@ import Resources from "../utils/Resources"
 import Theme from "../Theme"
 export default class World {
 	public room?: Room
-	// private floor?: Floor
+	public floor?: Floor
 	private environment?: Environment
 	private resources: Resources
 	// private controls?: Controls
@@ -17,8 +17,8 @@ export default class World {
 		this.theme = this.experience.theme
 		this.resources.on("ready", () => {
 			this.environment = new Environment(this.experience)
+			this.floor = new Floor(this.experience)
 			this.room = new Room(this.experience)
-			// this.floor = new Floor(this.experience)
 			new Floor(this.experience)
 			// this.controls = new Controls(this.experience)
 			new Controls(this.experience)
