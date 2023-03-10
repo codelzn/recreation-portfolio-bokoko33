@@ -15,6 +15,11 @@ export default class Preloader extends EventEmitter {
 	private firstTimeline?: gsap.core.Timeline
 	private secondTimeline?: gsap.core.Timeline
 	private scrollOnceEvent?: (e: WheelEvent) => void
+	private touchStart?: (e: TouchEvent) => void
+	private touchMove?: (e: TouchEvent) => void
+	private initalY: number | null = null
+	private moveFlag: boolean = false
+	private scaleFlag: boolean = false
 	constructor(private readonly experience: Experience) {
 		super()
 		this.world = this.experience.world
@@ -66,101 +71,223 @@ export default class Preloader extends EventEmitter {
 						z: -1,
 						ease: "power1.out",
 						duration: 0.7,
+						onComplete: resolve,
 					})
 			}
 		})
 	}
 
 	private onScroll(e: WheelEvent) {
-		if (e.deltaY > 0 && this.scrollOnceEvent) {
-			window.removeEventListener("wheel", this.scrollOnceEvent)
+		if (e.deltaY > 0) {
+			this.removeEventListeners()
 			this.PlaysecondIntro()
 		}
 	}
 
+	private onTouch(e: TouchEvent) {
+		this.initalY = e.touches[0].clientY
+	}
+
+	private onTouchMove(e: TouchEvent) {
+		let currentY = e.touches[0].clientY
+		let difference = currentY - this.initalY!
+		if (difference > 0) {
+			this.removeEventListeners()
+			this.PlaysecondIntro()
+		}
+		this.initalY = null
+	}
+
+	private removeEventListeners() {
+		window.removeEventListener("wheel", this.scrollOnceEvent!)
+		window.removeEventListener("touchstart", this.touchStart!)
+		window.removeEventListener("touchmove", this.touchMove!)
+	}
+
 	private async playIntro() {
 		await this.firstIntro()
+		this.moveFlag = true
 		this.scrollOnceEvent = this.onScroll.bind(this)
+		this.touchStart = this.onTouch.bind(this)
+		this.touchMove = this.onTouchMove.bind(this)
 		window.addEventListener("wheel", this.scrollOnceEvent)
+		window.addEventListener("touchstart", this.touchStart)
+		window.addEventListener("touchmove", this.touchMove)
 	}
 
 	private async PlaysecondIntro() {
-		await this.secondIntro()
+    this.moveFlag = false
+    this.scaleFlag = true
+    await this.secondIntro()
+    this.scaleFlag = false
+		this.emit("enablecontrols")
 	}
 
 	private secondIntro() {
-		return new Promise(() => {
+		return new Promise(resolve => {
 			this.secondTimeline = gsap.timeline()
-			if (this.device === "desktop") {
-				this.secondTimeline
-					.to(
-						this.room!.position,
-						{
-							x: 0,
-							y: 0,
-							z: 0,
-							ease: "power1.out",
-						},
-						"same"
-					)
-					.to(
-						this.roomChildren.cube.rotation,
-						{
-							y: 2 * Math.PI + Math.PI / 4,
-						},
-						"same"
-					)
-					.to(
-						this.roomChildren.cube.scale,
-						{
-							x: 10,
-							y: 10,
-							z: 10,
-						},
-						"same"
-					)
-					.to(
-						this.orthographicCamera.position,
-						{
-							y: 6.5,
-						},
-						"same"
-					)
-					.to(
-						this.roomChildren.cube.position,
-						{
-							x: 0.638711,
-							y: 8.5618,
-							z: 1.3243,
-						},
-						"same"
-					)
-					.set(this.roomChildren.body.scale, {
-						x: 1,
-						y: 1,
-						z: 1,
-					})
-					.to(this.roomChildren.cube.scale, {
+			this.secondTimeline
+				.to(
+					this.room!.position,
+					{
 						x: 0,
 						y: 0,
 						z: 0,
-					})
-					.to(this.roomChildren.aquarium.scale, {
+						ease: "power1.out",
+					},
+					"same"
+				)
+				.to(
+					this.roomChildren.cube.rotation,
+					{
+						y: 2 * Math.PI + Math.PI / 4,
+					},
+					"same"
+				)
+				.to(
+					this.roomChildren.cube.scale,
+					{
+						x: 10,
+						y: 10,
+						z: 10,
+					},
+					"same"
+				)
+				.to(
+					this.orthographicCamera.position,
+					{
+						y: 6.5,
+					},
+					"same"
+				)
+				.to(
+					this.roomChildren.cube.position,
+					{
+						x: 0.638711,
+						y: 8.5618,
+						z: 1.3243,
+					},
+					"same"
+				)
+				.set(this.roomChildren.body.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+				})
+				.to(this.roomChildren.cube.scale, {
+					x: 0,
+					y: 0,
+					z: 0,
+				})
+				.to(this.roomChildren.aquarium.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.clock.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.shelves.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.floor_items.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.desks.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.table_stuff.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.to(this.roomChildren.computer.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+					ease: "back.out(2.2)",
+					duration: 0.5,
+				})
+				.set(this.roomChildren.mini_floor.scale, {
+					x: 1,
+					y: 1,
+					z: 1,
+				})
+				.to(
+					this.roomChildren.chair.scale,
+					{
 						x: 1,
 						y: 1,
 						z: 1,
 						ease: "back.out(2.2)",
 						duration: 0.5,
-					})
-			} else {
-				this.secondTimeline.to(this.room!.position, {
-					x: 0,
-					y: 0,
-					z: 0,
-					ease: "power1.out",
-					duration: 0.7,
-				})
-			}
+					},
+					"chair"
+				)
+				.to(
+					this.roomChildren.fish.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					"chair"
+				)
+				.to(
+					this.roomChildren.chair.rotation,
+					{
+						y: 4 * Math.PI + Math.PI / 4,
+						ease: "power2.out",
+						duration: 1,
+						onComplete: resolve,
+					},
+					"chair"
+				)
 		})
+	}
+	private move() {
+		if (this.device === "desktop") {
+			this.room?.position.set(-1, 0, 0)
+		} else {
+			this.room?.position.set(0, 0, -1)
+		}
+	}
+
+	private scale() {
+		if (this.device === "desktop") {
+			this.room?.scale.set(0.11, 0.11, 0.11)
+		} else {
+			this.room?.scale.set(0.07, 0.07, 0.07)
+		}
+	}
+	public update() {
+		if (this.moveFlag) {
+			this.move()
+		}
+		if (this.scaleFlag) {
+			this.scale()
+		}
 	}
 }

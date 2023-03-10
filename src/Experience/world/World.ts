@@ -2,7 +2,6 @@ import { EventEmitter } from "events"
 import Room from "./Room"
 import Floor from "./Floor"
 import Environment from "./Environment"
-import Controls from "./Controls"
 import Experience from ".."
 import Resources from "../utils/Resources"
 import Theme from "../Theme"
@@ -19,9 +18,8 @@ export default class World extends EventEmitter {
 		this.resources.on("ready", () => {
 			this.environment = new Environment(this.experience)
 			this.floor = new Floor(this.experience)
-      this.room = new Room(this.experience)
-			new Controls(this.experience)
-      this.emit("worldready")
+			this.room = new Room(this.experience)
+			this.emit("worldready")
 		})
 		this.theme.on("switch", (theme: "light" | "dark") => {
 			this.switchTheme(theme)

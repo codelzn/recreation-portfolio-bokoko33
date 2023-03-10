@@ -8,6 +8,7 @@ import Renderer from "./Renderer"
 import Time from "./utils/Time"
 import World from "./world/World"
 import Preloader from "./Preloader"
+import Controls from "./world/Controls"
 
 export default class Experience {
 	private static instance: Experience
@@ -21,6 +22,7 @@ export default class Experience {
 	public world: World
   public theme: Theme
   public preloader: Preloader
+  public controls?: Controls
 	private constructor() {
 		this.canvas =
 			document.querySelector<HTMLCanvasElement>(".experience-canvas")!
@@ -31,6 +33,9 @@ export default class Experience {
 		this.theme = new Theme()
     this.world = new World(this)
     this.preloader = new Preloader(this)
+    this.preloader.on('enablecontrols', () => {
+      this.controls = new Controls(this)
+    })
 		this.sizes.on("resize", () => {
 			this.resize()
 		})
@@ -44,10 +49,11 @@ export default class Experience {
 		}
 		return Experience.instance
 	}
-	private update() {
+  private update() {
+    this.preloader.update()
 		this.camera.update()
 		this.world.update()
-		this.renderer.update()
+    this.renderer.update()
 	}
 	private resize() {
 		this.camera.resize()
