@@ -3,6 +3,7 @@ import * as THREE from "three"
 import Experience from "."
 import World from "./world/World"
 import gsap from "gsap"
+import convert from "./utils/covertDivsToSpans"
 import Sizes from "./utils/Sizes"
 
 export default class Preloader extends EventEmitter {
@@ -36,6 +37,11 @@ export default class Preloader extends EventEmitter {
 	}
 
 	private setAssets() {
+		convert(document.querySelector(".intro-text")!)
+		convert(document.querySelector(".hero-main-title")!)
+		convert(document.querySelector(".hero-main-description")!)
+		convert(document.querySelector(".hero-second-subheading")!)
+		convert(document.querySelector(".second-sub")!)
 		this.room = this.experience.world.room?.actualRoom
 		this.roomChildren = this.experience.world.room!.roomChildren
 	}
@@ -56,7 +62,6 @@ export default class Preloader extends EventEmitter {
 						x: -1,
 						ease: "power1.out",
 						duration: 0.7,
-						onComplete: resolve,
 					})
 			} else {
 				this.firstTimeline
@@ -71,9 +76,14 @@ export default class Preloader extends EventEmitter {
 						z: -1,
 						ease: "power1.out",
 						duration: 0.7,
-						onComplete: resolve,
 					})
 			}
+			this.firstTimeline.to(".intro-text .animatedis", {
+				yPercent: -100,
+				stagger: 0.05,
+				ease: "back.out(1.7)",
+				onComplete: resolve,
+			})
 		})
 	}
 
@@ -116,10 +126,10 @@ export default class Preloader extends EventEmitter {
 	}
 
 	private async PlaysecondIntro() {
-    this.moveFlag = false
-    this.scaleFlag = true
-    await this.secondIntro()
-    this.scaleFlag = false
+		this.moveFlag = false
+		this.scaleFlag = true
+		await this.secondIntro()
+		this.scaleFlag = false
 		this.emit("enablecontrols")
 	}
 
@@ -127,6 +137,11 @@ export default class Preloader extends EventEmitter {
 		return new Promise(resolve => {
 			this.secondTimeline = gsap.timeline()
 			this.secondTimeline
+				.to(".intro-text .animatedis", {
+					yPercent: 100,
+					stagger: 0.05,
+					ease: "back.in(1.7)",
+				})
 				.to(
 					this.room!.position,
 					{
@@ -178,7 +193,28 @@ export default class Preloader extends EventEmitter {
 					x: 0,
 					y: 0,
 					z: 0,
-				})
+					duration: 1,
+				}, 'introtext')
+				.to(".hero-main-title .animatedis", {
+					yPercent: -100,
+					stagger: 0.07,
+					ease: "back.out(1.7)",
+				}, 'introtext')
+				.to(".hero-main-description .animatedis", {
+					yPercent: -100,
+					stagger: 0.07,
+					ease: "back.out(1.7)",
+				}, 'introtext')
+				.to(".first-sub .animatedis", {
+					yPercent: -100,
+					stagger: 0.07,
+					ease: "back.out(1.7)",
+				}, 'introtext')
+				.to(".second-sub .animatedis", {
+					yPercent: -100,
+					stagger: 0.07,
+					ease: "back.out(1.7)",
+				}, 'introtext')
 				.to(this.roomChildren.aquarium.scale, {
 					x: 1,
 					y: 1,
