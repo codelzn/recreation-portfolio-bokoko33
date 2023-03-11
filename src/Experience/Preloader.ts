@@ -49,6 +49,13 @@ export default class Preloader extends EventEmitter {
 	private firstIntro() {
 		return new Promise(resolve => {
 			this.firstTimeline = gsap.timeline()
+			this.firstTimeline.set(".animatedis", { y: 0, yPercent: 100 })
+			this.firstTimeline.to(".preloader", {
+				opacity: 0,
+				onComplete: () => {
+					document.querySelector(".preloader")!.classList.add("hidden")
+				},
+			})
 			if (this.device === "desktop") {
 				this.firstTimeline
 					.to(this.roomChildren.cube.scale, {
@@ -78,12 +85,27 @@ export default class Preloader extends EventEmitter {
 						duration: 0.7,
 					})
 			}
-			this.firstTimeline.to(".intro-text .animatedis", {
-				yPercent: -100,
-				stagger: 0.05,
-				ease: "back.out(1.7)",
-				onComplete: resolve,
-			})
+			this.firstTimeline
+				.to(".intro-text .animatedis", {
+					yPercent: 0,
+					stagger: 0.05,
+					ease: "back.out(1.7)",
+				})
+				.to(
+					".arrow-svg-wrapper",
+					{
+						opacity: 1,
+					},
+					"same"
+				)
+				.to(
+					".toggle-bar",
+					{
+						opacity: 1,
+						onComplete: resolve,
+					},
+					"same"
+				)
 		})
 	}
 
@@ -115,6 +137,7 @@ export default class Preloader extends EventEmitter {
 	}
 
 	private async playIntro() {
+		this.scaleFlag = true
 		await this.firstIntro()
 		this.moveFlag = true
 		this.scrollOnceEvent = this.onScroll.bind(this)
@@ -127,7 +150,7 @@ export default class Preloader extends EventEmitter {
 
 	private async PlaysecondIntro() {
 		this.moveFlag = false
-		this.scaleFlag = true
+		this.scaleFlag = false
 		await this.secondIntro()
 		this.scaleFlag = false
 		this.emit("enablecontrols")
@@ -137,11 +160,22 @@ export default class Preloader extends EventEmitter {
 		return new Promise(resolve => {
 			this.secondTimeline = gsap.timeline()
 			this.secondTimeline
-				.to(".intro-text .animatedis", {
-					yPercent: 100,
-					stagger: 0.05,
-					ease: "back.in(1.7)",
-				})
+				.to(
+					".intro-text .animatedis",
+					{
+						yPercent: 100,
+						stagger: 0.05,
+						ease: "back.in(1.7)",
+					},
+					"fadeout"
+				)
+				.to(
+					".arrow-svg-wrapper",
+					{
+						opacity: 0,
+					},
+					"fadeout"
+				)
 				.to(
 					this.room!.position,
 					{
@@ -189,74 +223,118 @@ export default class Preloader extends EventEmitter {
 					y: 1,
 					z: 1,
 				})
-				.to(this.roomChildren.cube.scale, {
-					x: 0,
-					y: 0,
-					z: 0,
-					duration: 1,
-				}, 'introtext')
-				.to(".hero-main-title .animatedis", {
-					yPercent: -100,
-					stagger: 0.07,
-					ease: "back.out(1.7)",
-				}, 'introtext')
-				.to(".hero-main-description .animatedis", {
-					yPercent: -100,
-					stagger: 0.07,
-					ease: "back.out(1.7)",
-				}, 'introtext')
-				.to(".first-sub .animatedis", {
-					yPercent: -100,
-					stagger: 0.07,
-					ease: "back.out(1.7)",
-				}, 'introtext')
-				.to(".second-sub .animatedis", {
-					yPercent: -100,
-					stagger: 0.07,
-					ease: "back.out(1.7)",
-				}, 'introtext')
-				.to(this.roomChildren.aquarium.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
-				.to(this.roomChildren.clock.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
-				.to(this.roomChildren.shelves.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
-				.to(this.roomChildren.floor_items.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
-				.to(this.roomChildren.desks.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
-				.to(this.roomChildren.table_stuff.scale, {
-					x: 1,
-					y: 1,
-					z: 1,
-					ease: "back.out(2.2)",
-					duration: 0.5,
-				})
+				.to(
+					this.roomChildren.cube.scale,
+					{
+						x: 0,
+						y: 0,
+						z: 0,
+						duration: 1,
+					},
+					"introtext"
+				)
+				.to(
+					".hero-main-title .animatedis",
+					{
+						yPercent: 0,
+						stagger: 0.07,
+						ease: "back.out(1.7)",
+					},
+					"introtext"
+				)
+				.to(
+					".hero-main-description .animatedis",
+					{
+						yPercent: 0,
+						stagger: 0.07,
+						ease: "back.out(1.7)",
+					},
+					"introtext"
+				)
+				.to(
+					".first-sub .animatedis",
+					{
+						yPercent: 0,
+						stagger: 0.07,
+						ease: "back.out(1.7)",
+					},
+					"introtext"
+				)
+				.to(
+					".second-sub .animatedis",
+					{
+						yPercent: 0,
+						stagger: 0.07,
+						ease: "back.out(1.7)",
+					},
+					"introtext"
+				)
+				.to(
+					this.roomChildren.aquarium.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.5"
+				)
+				.to(
+					this.roomChildren.clock.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.4"
+				)
+				.to(
+					this.roomChildren.shelves.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.3"
+				)
+				.to(
+					this.roomChildren.floor_items.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.2"
+				)
+				.to(
+					this.roomChildren.desks.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.1"
+				)
+				.to(
+					this.roomChildren.table_stuff.scale,
+					{
+						x: 1,
+						y: 1,
+						z: 1,
+						ease: "back.out(2.2)",
+						duration: 0.5,
+					},
+					">-0.1"
+				)
 				.to(this.roomChildren.computer.scale, {
 					x: 1,
 					y: 1,
@@ -297,10 +375,13 @@ export default class Preloader extends EventEmitter {
 						y: 4 * Math.PI + Math.PI / 4,
 						ease: "power2.out",
 						duration: 1,
-						onComplete: resolve,
 					},
 					"chair"
 				)
+				.to(".arrow-svg-wrapper", {
+					opacity: 1,
+					onComplete: resolve,
+				})
 		})
 	}
 	private move() {
@@ -312,6 +393,10 @@ export default class Preloader extends EventEmitter {
 	}
 
 	private scale() {
+		// @ts-ignore
+		this.roomChildren.rectLight.width = 0
+		// @ts-ignore
+		this.roomChildren.rectLight.height = 0
 		if (this.device === "desktop") {
 			this.room?.scale.set(0.11, 0.11, 0.11)
 		} else {
